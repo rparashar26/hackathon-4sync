@@ -41,10 +41,18 @@ model_choice = st.selectbox("🧠 Choose Model", ["phi3", "tinyllama", "llama3",
 # Spell checker
 
 spell = SpellChecker()
+ALLOWLIST = {"parkar"}
 
 def correct_spelling(text):
-
-    return ' '.join([spell.correction(w) or w for w in text.split()])
+   corrected_words = []
+   for word in text.split():
+       # Check against allowlist (case-insensitive)
+       if word.lower() in ALLOWLIST:
+           corrected_words.append(word)
+       else:
+           corrected = spell.correction(word)
+           corrected_words.append(corrected if corrected else word)
+   return ' '.join(corrected_words)
 
 # Grammar correction
 
@@ -237,6 +245,6 @@ if vectorstore:
                 for doc in sources:
 
                     st.markdown(f"**{os.path.basename(doc.metadata['source'])}**")
-    
+
                     st.write(doc.page_content[:300] + "...")
  
